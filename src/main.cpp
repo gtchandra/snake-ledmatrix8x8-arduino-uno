@@ -21,7 +21,7 @@
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
-#include <Wire.h>
+
 #include <Adafruit_GFX.h>
 #include "Adafruit_LEDBackpack.h"
 #include <SPI.h>
