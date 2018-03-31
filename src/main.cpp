@@ -38,10 +38,10 @@ void changeDirection() {
 }
 
 void setup() {
-  pinMode (0,INPUT_PULLUP);
-  pinMode (1,INPUT_PULLUP);
   pinMode (2,INPUT_PULLUP);
   pinMode (3,INPUT_PULLUP);
+  pinMode (4,INPUT_PULLUP);
+  pinMode (5,INPUT_PULLUP);
   //attachInterrupt(0,changeDirection,FALLING); // interrupt 0 is connected to PIN 2
   Serial.begin(9600);
   Serial.println("8x8 LED Matrix Test");
@@ -64,16 +64,16 @@ static const uint8_t PROGMEM
     B10100101,
     B10000001,
     B10100101,
-    B10011001,
-    B01000010,
+    B10111101,
+    B00000000,
     B00111100 },
   neutral_bmp[] =
   { B00111100,
     B01000010,
     B10100101,
     B10000001,
-    B10011001,
-    B10100101,
+    B10111101,
+    B10000001,
     B01000010,
     B00111100 };
 
@@ -173,39 +173,51 @@ void loop() {
   }
 */
   //da fare circuito antirimbalzo a 4 pulsanti
-  if (digitalRead(0)==LOW) {
-    mysnake.setDirection('u');
-  }
-  if (digitalRead(1)==LOW) {
-    mysnake.setDirection('l');
-  }
   if (digitalRead(2)==LOW) {
-    mysnake.setDirection('r');
+    mysnake.setDirection('u');
+    Serial.println("U");
   }
   if (digitalRead(3)==LOW) {
+    mysnake.setDirection('l');
+    Serial.println("L");
+  }
+  if (digitalRead(4)==LOW) {
+    mysnake.setDirection('r');
+    Serial.println("R");
+  }
+  if (digitalRead(5)==LOW) {
     mysnake.setDirection('d');
+    Serial.println("D");
   }
 
   if (!mysnake.gameover) {
     //Serial.println("posx: "+(String)mysnake.posx+" posy:"+(String)mysnake.posy);
     //Serial.println("Appx: "+(String)mysnake.applex+" Appy:"+(String)mysnake.appley);
 
-    if ((millis()-lastmove)>150) {
+    if ((millis()-lastmove)>100) {
           matrix.drawPixel(mysnake.applex, mysnake.appley, LED_ON);
           matrix.drawPixel(mysnake.posx, mysnake.posy, LED_ON);
           matrix.drawPixel(mysnake.todelx, mysnake.todely, LED_OFF);
           mysnake.nextmove();
           lastmove=millis();
     }
-
-
   }
   else
   {
     matrix.clear();
     matrix.drawBitmap(0, 0, neutral_bmp, 8, 8, LED_ON);
     matrix.writeDisplay();
-    delay (5000);
+    delay (1000);
+
+    for (int8_t x=7; x>=-60; x--) {
+        matrix.clear();
+        matrix.setCursor(x,0);
+        matrix.print("Score:"+(String)mysnake.length);
+        matrix.writeDisplay();
+        delay(100);
+    }
+
+
     Serial.println("game over cycle");
     countr=0;
   }
