@@ -38,8 +38,11 @@ void changeDirection() {
 }
 
 void setup() {
+  pinMode (0,INPUT_PULLUP);
+  pinMode (1,INPUT_PULLUP);
   pinMode (2,INPUT_PULLUP);
-  attachInterrupt(0,changeDirection,FALLING); // interrupt 0 is connected to PIN 2
+  pinMode (3,INPUT_PULLUP);
+  //attachInterrupt(0,changeDirection,FALLING); // interrupt 0 is connected to PIN 2
   Serial.begin(9600);
   Serial.println("8x8 LED Matrix Test");
   matrix.begin(0x70);  // pass in the address
@@ -96,14 +99,9 @@ Snake::Snake (uint16_t w, uint16_t h)
 }
 void Snake::setDirection(char dir) {
   //this avoid inversion of direction
-  //if ((_direction=='l' and dir=='r') or (_direction=='r' and dir=='l')) return;
-  //if ((_direction=='u' and dir=='d') or (_direction=='d' and dir=='u')) return;
-  if (_direction=='r' and dir=='r') _direction='d';
-  if (_direction=='d' and dir=='r') _direction='l';
-  if (_direction=='u' and dir=='r') _direction='r';
-  if (_direction=='l' and dir=='r') _direction='u';
-
-  //_direction=dir;
+  if ((_direction=='l' and dir=='r') or (_direction=='r' and dir=='l')) return;
+  if ((_direction=='u' and dir=='d') or (_direction=='d' and dir=='u')) return;
+  _direction=dir;
 }
 char Snake::getDirection() {
       return _direction;
@@ -165,14 +163,7 @@ Snake::~Snake(void) {
 void loop() {
   countr++;
 
-  if (interr) {
-    Serial.println("interrupt triggered");
-    if((millis()-lastclick)>150) {
-        mysnake.setDirection('r');
-        lastclick=millis();
-    }
-    interr=false;
-  }
+
   /*
   //RANDOM MODE
   int ran2=random(3)+1;
@@ -182,12 +173,18 @@ void loop() {
   }
 */
   //da fare circuito antirimbalzo a 4 pulsanti
-  //if (digitalRead(2)==LOW) {
-  //  mysnake.setDirection('r');
-  //}
-  //if (digitalRead(3)==LOW) {
-  //  mysnake.setDirection('r');
-  //}
+  if (digitalRead(0)==LOW) {
+    mysnake.setDirection('u');
+  }
+  if (digitalRead(1)==LOW) {
+    mysnake.setDirection('l');
+  }
+  if (digitalRead(2)==LOW) {
+    mysnake.setDirection('r');
+  }
+  if (digitalRead(3)==LOW) {
+    mysnake.setDirection('d');
+  }
 
   if (!mysnake.gameover) {
     //Serial.println("posx: "+(String)mysnake.posx+" posy:"+(String)mysnake.posy);
