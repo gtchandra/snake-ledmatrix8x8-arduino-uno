@@ -88,7 +88,7 @@ void loop() {
         matrix.writeDisplay();
         delay(100);
     }
-    Serial.println("game over cycle");
+    delay(1000);
     countr=0;
   }
   matrix.writeDisplay();
