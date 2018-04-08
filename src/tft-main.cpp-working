@@ -1,0 +1,64 @@
+#include <Adafruit_GFX.h>
+#include "Adafruit_LEDBackpack.h"
+#include <SPI.h>
+#include <Snake.h>
+#include <Adafruit_ST7735.h>
+
+long countr=0;
+long lastmove=0;
+//Adafruit_8x8matrix matrix = Adafruit_8x8matrix();
+Snake mysnake = Snake(32,32);
+Adafruit_ST7735 tft = Adafruit_ST7735(10,8,9);
+
+void lowRespixel(uint8_t x,uint8_t y,uint16_t color) {
+//32x32 pixel low resolution function
+tft.fillRect(x*5,y*4, 5, 4, color);
+}
+
+void setup() {
+  //control button connections (avoid 0,1 since serial comms may autofire buttons)
+  pinMode (2,INPUT_PULLUP);
+  pinMode (3,INPUT_PULLUP);
+  pinMode (4,INPUT_PULLUP);
+  pinMode (5,INPUT_PULLUP);
+  Serial.begin(9600);
+  Serial.println("Snake Started");
+  tft.initR(INITR_BLACKTAB);   // initialize a ST7735S chip, black tab
+  tft.setRotation(1);
+  tft.fillScreen(ST7735_BLACK);
+  tft.fillRect(10,10,50,50,ST7735_WHITE);
+  delay (500);
+  tft.fillScreen(ST7735_BLACK);
+}
+
+void loop() {
+  countr++;
+  if (digitalRead(2)==LOW) {
+    mysnake.setDirection('u');
+  }
+  if (digitalRead(3)==LOW) {
+    mysnake.setDirection('l');
+  }
+  if (digitalRead(4)==LOW) {
+    mysnake.setDirection('r');
+  }
+  if (digitalRead(5)==LOW) {
+    mysnake.setDirection('d');
+  }
+
+  if (!mysnake.gameover) {
+    if ((millis()-lastmove)>90) {
+          lowRespixel (mysnake.applex, mysnake.appley, ST7735_WHITE);
+          lowRespixel (mysnake.posx, mysnake.posy, ST7735_WHITE);
+          lowRespixel (mysnake.todelx, mysnake.todely, ST7735_BLACK);
+          mysnake.nextmove();
+          lastmove=millis();
+    }
+  }
+  else
+  {
+    tft.fillScreen(ST7735_BLACK);
+    delay (1000);
+    //missing score
+    }
+}

@@ -24,7 +24,7 @@ class Snake {
  private:
   uint16_t _width;
   uint16_t _height;
-  uint8_t *buffer;
+  uint16_t *buffer;
   char _direction;
 };
 
