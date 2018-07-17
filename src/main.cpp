@@ -16,12 +16,14 @@ void setup() {
   pinMode (A1,INPUT);
   pinMode (PD3,OUTPUT); //pin used to shutdown power
   digitalWrite(PD3,HIGH);
+  matrix.setRotation(1); //ROTATION needed in new design board
   Serial.begin(9600);
   Serial.println("Snake Started");
   matrix.begin(0x70);  // pass in the address
   matrix.clear();
-  matrix.drawRect(0,0, 8,8, LED_ON);
-  matrix.drawRect(2,2, 4,4, LED_ON);
+  matrix.drawRect(0,0, 2,2, LED_ON);
+  //matrix.drawRect(0,0, 8,8, LED_ON);
+  //matrix.drawRect(2,2, 4,4, LED_ON);
   matrix.writeDisplay();  // write the changes we just made to the display
   delay (1000);
   matrix.clear();
@@ -82,7 +84,7 @@ void loop() {
             matrix.drawBitmap(0, 0, neutral_bmp, 8, 8, LED_ON);
             matrix.writeDisplay();
             delay (1000);
-
+            matrix.setTextWrap(false);
             for (int8_t x=7; x>=-60; x--) {
                 matrix.clear();
                 matrix.setCursor(x,0);
