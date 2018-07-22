@@ -8,7 +8,9 @@ long lastmove=0;
 Adafruit_8x8matrix matrix = Adafruit_8x8matrix();
 Snake mysnake = Snake(8,8);
 float th_low = 200;
-float th_high = 800;
+float th_high = 600;
+int analog0;
+int analog1;
 
 void setup() {
   //control using analog joystick on A0 / A1 pins (hi-low thresholds)
@@ -17,6 +19,7 @@ void setup() {
   pinMode (PD3,OUTPUT); //pin used to shutdown power
   digitalWrite(PD3,HIGH);
   matrix.setRotation(1); //ROTATION needed in new design board
+  matrix.setBrightness(1);
   Serial.begin(9600);
   Serial.println("Snake Started");
   matrix.begin(0x70);  // pass in the address
@@ -52,19 +55,25 @@ static const uint8_t PROGMEM
 
 void loop() {
   countr++;
-  if (analogRead(A0)>th_high) {
+  analog0=analogRead(A0);
+  analog1=analogRead(A1);
+  if (analog0>th_high) {
+    delay(100);
     mysnake.setDirection('u');
     countr=millis();
   }
-  if (analogRead(A0)<th_low) {
+  if (analog0<th_low) {
+    delay(100);
     mysnake.setDirection('d');
     countr=millis();
   }
-  if (analogRead(A1)>th_high) {
+  if (analog1>th_high) {
+    delay(100);
     mysnake.setDirection('r');
     countr=millis();
   }
-  if (analogRead(A1)<th_low) {
+  if (analog1<th_low) {
+    delay(100);
     mysnake.setDirection('l');
     countr=millis();
   }
