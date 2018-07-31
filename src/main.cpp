@@ -24,37 +24,28 @@ void setup() {
   Serial.println("Snake Started");
   matrix.begin(0x70);  // pass in the address
   matrix.clear();
-  matrix.drawRect(0,0, 2,2, LED_ON);
-  //matrix.drawRect(0,0, 8,8, LED_ON);
-  //matrix.drawRect(2,2, 4,4, LED_ON);
-  matrix.writeDisplay();  // write the changes we just made to the display
-  delay (1000);
+  for (int i=3;i>=0;i--) {
+    matrix.drawRect(0+i,0+i, 8-i*2,8-i*2, LED_ON);
+    matrix.writeDisplay();  // write the changes we just made to the display
+    delay(100);
+    matrix.drawRect(0+i,0+i, 8-i*2,8-i*2, LED_OFF);
+    matrix.writeDisplay();  // write the changes we just made to the display
+  }
+  for (int i=0;i<5;i++){
+    matrix.drawRect(0,0, 8,8, LED_ON);
+    matrix.writeDisplay();
+    delay(80);
+    matrix.drawRect(0,0, 8,8, LED_OFF);
+    matrix.writeDisplay();
+    delay(100);
+  }
+
   matrix.clear();
   matrix.writeDisplay();  // write the changes we just made to the display
+  countr=millis();
 }
-//smiles
-static const uint8_t PROGMEM
-  smile_bmp[] =
-  { B00111100,
-    B01000010,
-    B10100101,
-    B10000001,
-    B10100101,
-    B10011001,
-    B00000000,
-    B00111100 },
-  neutral_bmp[] =
-  { B00111100,
-    B01000010,
-    B10100101,
-    B10000001,
-    B10111101,
-    B10000001,
-    B01000010,
-    B00111100 };
 
 void loop() {
-  countr++;
   analog0=analogRead(A0);
   analog1=analogRead(A1);
   if (analog0>th_high) {
@@ -78,39 +69,60 @@ void loop() {
     countr=millis();
   }
   if ((millis()-countr)<20000) {
-          if (!mysnake.gameover) {
-            if ((millis()-lastmove)>100) {
-                  matrix.drawPixel(mysnake.applex, mysnake.appley, LED_ON);
-                  matrix.drawPixel(mysnake.posx, mysnake.posy, LED_ON);
-                  matrix.drawPixel(mysnake.todelx, mysnake.todely, LED_OFF);
-                  mysnake.nextmove();
-                  lastmove=millis();
+        if ((millis()-lastmove)>100) {
+              matrix.drawPixel(mysnake.applex, mysnake.appley, LED_ON);
+              matrix.drawPixel(mysnake.posx, mysnake.posy, LED_ON);
+              matrix.drawPixel(mysnake.todelx, mysnake.todely, LED_OFF);
+              mysnake.nextmove();
+              lastmove=millis();
+              matrix.writeDisplay();
+              }
+       if (mysnake.gameover) {
+            //game over sequence
+            for(int zz=0;zz<10;zz++) {
+              matrix.drawPixel(mysnake.posx, mysnake.posy, LED_OFF);
+              delay(150);
+              matrix.writeDisplay();
+              matrix.drawPixel(mysnake.posx, mysnake.posy, LED_ON);
+              delay(50);
+              matrix.writeDisplay();
             }
-          }
-          else
-          {
-            matrix.clear();
-            matrix.drawBitmap(0, 0, neutral_bmp, 8, 8, LED_ON);
-            matrix.writeDisplay();
-            delay (1000);
-            matrix.setTextWrap(false);
-            for (int8_t x=7; x>=-60; x--) {
-                matrix.clear();
-                matrix.setCursor(x,0);
-                matrix.print("Score:"+(String)mysnake.length);
-                matrix.writeDisplay();
-                delay(100);
-            }
-            delay(1000);
-          }
-          matrix.writeDisplay();
-      }
+             delay (1000);
+             matrix.setTextWrap(false);
+             for (int8_t x=7; x>=-41; x--) {
+                 matrix.clear();
+                 matrix.setCursor(x,0);
+                 matrix.print("Score:"+(String)mysnake.length);
+                 matrix.writeDisplay();
+                 delay(100);
+             }
+             delay(1000);
+             countr=0;
+           }
+
+    }
     else
       {
           matrix.clear();
+          for (int i=0;i<5;i++){
+            matrix.drawRect(0,0, 8,8, LED_ON);
+            matrix.writeDisplay();
+            delay(80);
+            matrix.drawRect(0,0, 8,8, LED_OFF);
+            matrix.writeDisplay();
+            delay(100);
+          }
+          for (int i=0;i<4;i++) {
+            matrix.drawRect(0+i,0+i, 8-i*2,8-i*2, LED_ON);
+            matrix.writeDisplay();  // write the changes we just made to the display
+            delay(50);
+            matrix.drawRect(0+i,0+i, 8-i*2,8-i*2, LED_OFF);
+            matrix.writeDisplay();  // write the changes we just made to the display
+          }
           matrix.writeDisplay();
+          delay(1000);
           digitalWrite(PD3,LOW); //shutdown
           delay(1000);
           digitalWrite(PD3,HIGH);
-      }
+  }
 }
