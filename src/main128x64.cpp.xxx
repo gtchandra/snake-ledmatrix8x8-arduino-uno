@@ -1,0 +1,110 @@
+#include <Adafruit_SSD1306.h>
+#include <Adafruit_GFX.h>
+#include <Wire.h>
+#include <Snake.h>
+#define OLED_ADDR   0x3C
+
+Adafruit_SSD1306 matrix(-1);
+
+long countr=0;
+long lastmove=0;
+Snake mysnake = Snake(20,16);
+float th_low = 200;
+float th_high = 600;
+int analog0;
+int analog1;
+
+void loresDrawpixel(uint8_t x,uint8_t y,uint16_t color) {
+//32x16 pixel low resolution function for TFT 128x64
+  matrix.fillRect(1+x*4,16+y*4, 3, 3, color);
+}
+void setup() {
+  //control using analog joystick on A0 / A1 pins (hi-low thresholds)
+  pinMode (A0,INPUT);
+  pinMode (A1,INPUT);
+  pinMode (PD3,OUTPUT); //pin used to shutdown power
+  digitalWrite(PD3,HIGH);
+  matrix.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
+  matrix.clearDisplay();
+  matrix.display();
+  Serial.begin(9600);
+  Serial.println("Snake Started");
+  matrix.drawRect(0, 0,128, 15, WHITE);
+  matrix.drawRect(0, 16,128, 48, WHITE);
+  matrix.setCursor(5,4);
+  matrix.setTextSize(1);
+  matrix.setTextColor(WHITE);
+  matrix.print("Snake++ S:");
+  matrix.display();  // write the changes we just made to the display
+  delay(1000);
+}
+
+void loop() {
+  //score Display
+  /*
+  matrix.setCursor(65,4);
+  matrix.setTextColor(BLACK);
+  matrix.print("5");
+  matrix.display();
+  matrix.setCursor(65,4);
+  matrix.setTextColor(WHITE);
+  matrix.print("5");
+  */
+  //------------------------------
+  analog0=analogRead(A0);
+  analog1=analogRead(A1);
+  if (analog0>th_high) {
+    delay(100);
+    mysnake.setDirection('u');
+    countr=millis();
+  }
+  if (analog0<th_low) {
+    delay(100);
+    mysnake.setDirection('d');
+    countr=millis();
+  }
+  if (analog1>th_high) {
+    delay(100);
+    mysnake.setDirection('r');
+    countr=millis();
+  }
+  if (analog1<th_low) {
+    delay(100);
+    mysnake.setDirection('l');
+    countr=millis();
+  }
+  if ((millis()-countr)<20000) {
+          if (!mysnake.gameover) {
+            if ((millis()-lastmove)>100) {
+                  loresDrawpixel(mysnake.applex, mysnake.appley, WHITE);
+                  loresDrawpixel(mysnake.posx, mysnake.posy, WHITE);
+                  loresDrawpixel(mysnake.todelx, mysnake.todely, BLACK);
+                  mysnake.nextmove();
+                  lastmove=millis();
+            }
+          }
+          else
+          {
+            matrix.clearDisplay();
+            matrix.drawRect(0, 0,128, 15, WHITE);
+            matrix.setTextSize(1);
+            matrix.setTextColor(WHITE);
+            matrix.setCursor(5,4);
+            matrix.print("GameOver");
+            matrix.display();
+            delay(10000);
+          }
+      }
+    else
+      {
+          matrix.clearDisplay();
+          matrix.setTextSize(1);
+          matrix.setTextColor(WHITE);
+          matrix.setCursor(5,4);
+          matrix.print("Shutdown");
+          matrix.display();
+          digitalWrite(PD3,LOW); //shutdown
+          delay(1000);
+          digitalWrite(PD3,HIGH);
+      }
+}

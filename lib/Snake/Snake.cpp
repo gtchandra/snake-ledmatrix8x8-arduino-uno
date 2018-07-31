@@ -60,22 +60,25 @@ void Snake::nextmove()
     applex=random(_width);
     appley=random(_height);
   }
-  //check collision and move snake queue
-  for (int i=length-1;i>0;i--) {
-    buffer[i]=buffer[i-1];
-    if (currentpos==buffer[i])
-    {
-      gameover=true;
-      return;
+
+    //check collision and move snake queue
+    for (int i=length-1;i>0;i--) {
+      buffer[i]=buffer[i-1];
+      if (currentpos==buffer[i])
+      {
+        gameover=true;
+        return;
+      }
     }
-  }
+
   todelx=buffer[length-1] % _width;
   todely=buffer[length-1] / _width;
   //delete last pixel at the end of cycle
   buffer[length-1]=0;
   //remove last pixel from array
-  buffer[0]=currentpos; //base point set
 
+
+  buffer[0]=currentpos; //base point set
   //insert new position into array head
 }
 Snake::~Snake(void) {
